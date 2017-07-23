@@ -23,7 +23,7 @@
 #input the path of the folder you want to convert
 param([string]$inputPath)
 
-#get the current path to return to later
+##get the current path to return to later
 $returnPath = Get-Item . | Select FullName
 $returnPath = $returnPath.FullName
 
