@@ -17,7 +17,7 @@
 #
 #	Usage: .\scriptname.ps1 "path to episodes"
 #
-#	Notes: need to add multi episode 
+#	Notes: need to add multi episode.
 #
 ##
 
