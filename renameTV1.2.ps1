@@ -10,6 +10,7 @@
 #					- removes additional special charters
 #					- accounts for additional sets of numbers in the season name, under 30 seasons
 #					- adds a leading zero on filename if season is under 10
+#			1.3:	- updated to account for brackets in the name
 #
 #	Assumptions: if the media is divided by season then the season folder name REQUIRES to have 
 #				the text SEASON in the folder name.
@@ -23,7 +24,7 @@
 #input the path of the folder you want to convert
 param([string]$inputPath)
 
-##get the current path to return to later
+###get the current path to return to later
 $returnPath = Get-Item . | Select FullName
 $returnPath = $returnPath.FullName
 
@@ -78,6 +79,8 @@ echo ("current season number -->" + $currentSeasonNum)
 [string]$currentSeason = $currentSeason -replace "-", ""
 [string]$currentSeason = $currentSeason -replace " - ", ""
 [string]$currentSeason = $currentSeason -replace "_", ""
+[string]$currentSeason = $currentSeason -replace "\[0\]", ""
+[string]$currentSeason = $currentSeason -replace "\[1\]", ""
 [string]$currentSeason = $currentSeason -replace "\(", ""
 [string]$currentSeason = $currentSeason -replace "\)", ""
 [string]$currentSeason = $currentSeason -replace "\[", ""
@@ -108,7 +111,11 @@ for ($j=0; $j -lt $extentionArray.count-1; $j++) {
 	
 	foreach ($file in $fileArray){
 		[string]$tempName = $file.name
-		[string]$orgName = $file.name
+		[string]$tempName = $tempName -replace "\[", ""
+		[string]$tempName = $tempName -replace "\]", ""
+		Move-Item -LiteralPath $file.name -Destination "$tempName"
+		[string]$orgName = $tempName
+
 		$tempName = $tempName.substring(0,$tempName.length-4) #removes the last 4 digits on the file name
 		$tempMatches = select-string '(\d+)' -input $tempName -AllMatches | Foreach {$_.matches} | Foreach {$_.value} #match any number series 1, or 01, or 11 
 # issue with this line as it will  match 1 or more digits on the string, what happens if there are more then one set of digits?
@@ -167,7 +174,7 @@ for ($j=0; $j -lt $extentionArray.count-1; $j++) {
 		")
 
 		#code goes here to actually rename the file
-		Rename-Item ".\$orgName" "$tempName$currentExtension" -ErrorAction silentlycontinue
+		Rename-Item ".\$orgName" "$tempName$currentExtension" #-ErrorAction silentlycontinue
 	}
 }
 cd "$returnPath"
