@@ -71,7 +71,7 @@ echo "get here 4"
 }
 
 
-echo ("current season number -->" + $currentSeasonNum)
+echo ("current season number --> $currentSeasonNum")
 
 # Get the season we are dealing with, records it to VAR
 # remove all these special characters
@@ -95,7 +95,7 @@ if ([int]$seasonNum -lt '10'){
 	$currentSeason = $currentSeason -replace "Season","qs"
 }
 echo $currentSeason
-if ((($currentSeason -notlike "*qs0*") -and ($currentSeason -notlike "*qs1*") -and ($currentSeason -notlike "*qs2*")) -or ($currentSeason -like "* qs")){
+if ((($currentSeason -notlike "*qs0*") -and ($currentSeason -notlike "*qs1*") -and ($currentSeason -notlike "*qs2*")) -or ($currentSeason -like "* qs*")){
 	$currentSeason = $currentSeason -replace "qs", " - s"
 }else {
 
@@ -128,9 +128,14 @@ for ($j=0; $j -lt $extentionArray.count-1; $j++) {
 			$fileNumber = $tempMatches
 		}
 		
-		echo ($fileNumber + " new file number")
-		#echo ($tempName + " - before name change")
-		#echo ($currentSeason + "   current season")
+		echo ("$fileNumber ---- new file number")
+		echo ("$($tempMatches[0]) -- Is this the season i want? Tempmatches[0]")
+		echo ("$currentSeason ---- current season")
+		if ($currentSeason -notlike "s*"){
+			$textSeason = $currentSeason
+			$currentSeason = "s$($tempMatches[0])"
+		}
+	echo ("$currentSeason ---- current season after check")
 		if ([int]$fileNumber -lt '10'){
 			if ($fileNumber -like "0*"){ #account for extra 0 in front
 				if ($currentSeason -like "* - s*"){ 
@@ -142,7 +147,24 @@ for ($j=0; $j -lt $extentionArray.count-1; $j++) {
 						$tempName = $currentPath.name + " - s" + $currentSeasonNum +"e" + $fileNumber
 					}
 				}else { # is no season name, dont put season in the name
-					$tempName = $seasonName + " - e" + $fileNumber
+					echo "did it get here in the match?"
+					echo "$currentSeason"
+					echo "$orgname"
+					if ($orgName -match $currentSeason) { # check here if there is a season in the name currently and set as season
+						$tempName = "$textSeason - " + $currentSeason + "e$fileNumber"
+						echo "match?"
+					}else {
+						$bigS = "S$($tempMatches[0])"
+						echo "$bigS -- match this"
+						echo "$orgName --to this"
+						if ($orgName -match $bigS){
+							echo "or here?"
+							$tempName = "$textSeason - " + $currentSeason + "e$fileNumber"
+						}else {
+							echo "or finally here?"
+							$tempName = $seasonName + " - e" + $fileNumber
+						}
+					}
 				}
 			}else{ #less then 10 with no leading 0 for the fileNumber
 				if ($currentSeason -like "* - s*"){
@@ -170,7 +192,8 @@ for ($j=0; $j -lt $extentionArray.count-1; $j++) {
 					$tempName = $seasonName + " - e" + $fileNumber
 				}
 		}
-		echo ($tempName + " - after name change
+		echo ("Before name change - $orgName")
+		echo ("After name change - $tempName
 		")
 
 		#code goes here to actually rename the file
