@@ -3,7 +3,7 @@
 #	Purpose: This script will take any file names of media specified and rename the 
 #			files according to the season and episode number.
 #
-#	Version 1.2
+#	Version 1.3
 #
 #	New In: 1.1: 	- fixed the iteration so it only goes through each media file once
 #			1.2:	- accounts for season folders names that arent just named "season xx"
